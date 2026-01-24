@@ -786,7 +786,11 @@ class IIDBootstrap(metaclass=DocStringInheritor):
             lower = np.zeros(k)
             upper = np.zeros(k)
             for i in range(k):
-                lower[i], upper[i] = np.percentile(values[:, i], list(percentiles[i]))
+                percentile = percentiles[i]
+                if percentile.min() <= 0 or percentile.max() >= 100:
+                    warnings.warn("Percentiles must be between 0 and 100.")
+                percentile = np.clip(percentile, 0.99, 99.99)
+                lower[i], upper[i] = np.percentile(values[:, i], list(percentile))
             # Basic and studentized use the lower empirical quantile to
             # compute upper and vice versa.  Bias corrected and percentile use
             # upper to estimate the upper, and lower to estimate the lower
